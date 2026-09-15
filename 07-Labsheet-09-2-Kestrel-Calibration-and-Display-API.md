@@ -380,9 +380,21 @@ Server: Kestrel
 ---
 
 ## 5. คำถามท้ายการทดลองเพื่อการประเมินผล
-1. เหตุใดการคำนวณสเกลเซนเซอร์จึงควรทำที่ฝั่ง Kestrel Server แทนที่จะคำนวณบนไมโครคอนโทรลเลอร์ ESP32 ตั้งแต่แรก?
-2. จากการทำ HTTP Forensics หากไม่มีการตรวจสอบเงื่อนไข `RawMax <= RawMin` ในโค้ด จะเกิด Exception ชนิดใดขึ้นในภาษา C# และส่งผลต่อการทำงานของเซิร์ฟเวอร์อย่างไร?
-3. อธิบายสาเหตุทางเทคนิคว่าทำไมคำขอ HTTP POST ที่ไม่มี Header `Content-Type: application/json` จึงถูกปฏิเสธด้วยรหัสสถานะ `415 Unsupported Media Type`?
+1. **เหตุใดการคำนวณสเกลเซนเซอร์จึงควรทำที่ฝั่ง Kestrel Server แทนที่จะคำนวณบนไมโครคอนโทรลเลอร์ ESP32 ตั้งแต่แรก?**
+   * **คำตอบ:**
+     1. **Decoupling of Hardware and Business Logic:** แยกหน้าที่ระหว่างฮาร์ดแวร์และตรรกะธุรกิจ โดย ESP32 ทำหน้าที่เป็น Edge Transducer อ่านสัญญาณแอนะล็อกดิบ (Raw ADC 0–4095) ให้แม่นยำที่สุด หากมีสูตรคำนวณสเกลที่ต้องเปลี่ยนประเภทเซนเซอร์หรือเปลี่ยนหน่วยวัด (เช่น % หรือ RPM) จะไม่ต้อง Re-flash เฟิร์มแวร์ใหม่
+     2. **Dynamic Runtime Calibration:** สามารถปรับแต่งพารามิเตอร์การปรับเทียบ (Zero/Span Point) ผ่านหน้าเว็บหรือ REST API ได้ทันทีแบบ Real-time บนเซิร์ฟเวอร์
+     3. **Edge Resource Conservation:** การคำนวณทศนิยม (Floating-point) ใช้พลังงานและรอบประมวลผลของ CPU การส่งเฉพาะ Raw Integer 12-bit ช่วยลดภาระและประหยัดพลังงานบน ESP32 ได้อย่างมาก
+
+2. **จากการทำ HTTP Forensics หากไม่มีการตรวจสอบเงื่อนไข `RawMax <= RawMin` ในโค้ด จะเกิด Exception ชนิดใดขึ้นในภาษา C# และส่งผลต่อการทำงานของเซิร์ฟเวอร์อย่างไร?**
+   * **คำตอบ:**
+     1. **ชนิด Exception และข้อผิดพลาด:** เมื่อเกิดกรณี `RawMax == RawMin` ในฟังก์ชัน `Compute()` จะเกิดการหารด้วยศูนย์ โดยเนื่องจากตัวแปรเป็นชนิด `double` จะได้ค่าเป็น `double.NaN` หรือ `double.PositiveInfinity` ซึ่งจะทำให้ขั้นตอน Serialize JSON ผิดพลาด หรือหากเป็นสูตรจำนวนเต็มจะเกิด `DivideByZeroException` ทันที และหาก `RawMax < RawMin` สเกลจะกลับทิศทาง (Inverted Scale)
+     2. **ผลกระทบต่อเซิร์ฟเวอร์:** หากไม่มีการดักจับ Unhandled Exception ตัว Kestrel Server จะตอบกลับด้วย `500 Internal Server Error` ทำให้ระบบขาดเสถียรภาพ การดักจับด้วย `ArgumentException` แล้วส่งกลับ `400 Bad Request` จึงเป็นแนวทาง Fail-Safe ตามมาตรฐาน REST
+
+3. **อธิบายสาเหตุทางเทคนิคว่าทำไมคำขอ HTTP POST ที่ไม่มี Header `Content-Type: application/json` จึงถูกปฏิเสธด้วยรหัสสถานะ `415 Unsupported Media Type`?**
+   * **คำตอบ:**
+     1. **Content Negotiation (RFC 9110):** Header `Content-Type` เป็นตัวแจ้งเซิร์ฟเวอร์ว่า Body ถูกส่งมาใน Format ใด
+     2. **Input Formatter ของ ASP.NET Core Kestrel:** Minimal API ต้องเลือก Formatter ที่เหมาะสม (`System.Text.Json`) เพื่อแปลง JSON Body เข้าสู่ C# Object (Model Binding) หากไคลเอนต์ไม่ส่ง Header `Content-Type: application/json` ตัว Kestrel จะไม่พบ Formatter ที่เข้ากันได้ และตัดการทำงานด้วยรหัส `415 Unsupported Media Type` ทันที
 
 
 
