@@ -223,6 +223,10 @@ app.Run();
 7. กด F5 เพื่อ Refresh หน้าเว็บ
 8. สังเกต Raw HTTP Response Headers
 
+#### ภาพหลักฐานผลการทดลอง:
+![Minimal API Routes Build and Telemetry Output](Images/lab9-2-activity-2-2-routes-build.png)
+
+* **ผลการสังเกต:** การผูก Route Minimal API เสร็จสมบูรณ์ คอมไพล์ `dotnet build` ผ่านฉลุย 0 Error(s) และเมื่อยิงทดสอบ `curl -i http://localhost:5202/api/telemetry` ได้รับสถานะ `HTTP/1.1 200 OK` พร้อม Response Header `Server: Kestrel` และก้อน JSON Telemetry ทันที
 
 ---
 

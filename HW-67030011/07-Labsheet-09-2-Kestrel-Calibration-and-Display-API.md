@@ -62,9 +62,14 @@
 ### กิจกรรมที่ 2.2: การผูก Minimal API Routes (Program.cs)
 
 ทำการลงทะเบียน `CalibrationService` เป็น Singleton และผูก Route ทั้ง 3 รูปแบบใน `Program.cs`:
-- `GET /api/telemetry`
-- `POST /api/potentiometer/calibrate`
-- `POST /api/oled/message`
+- `GET /api/telemetry` : อ่านข้อมูลค่าเซนเซอร์ดิบและค่าที่ปรับเทียบแล้ว
+- `POST /api/potentiometer/calibrate` : อัปเดตพารามิเตอร์การปรับเทียบ
+- `POST /api/oled/message` : ส่งข้อความแจ้งเตือนขึ้นหน้าจอ OLED
+
+#### ภาพหลักฐานผลการทดลอง:
+![Minimal API Routes Build and Telemetry Output](Images/lab9-2-activity-2-2-routes-build.png)
+
+* **ผลการสังเกต:** การผูก Route Minimal API เสร็จสมบูรณ์ คอมไพล์ `dotnet build` ผ่านฉลุย 0 Error(s) และเมื่อยิงทดสอบ `curl -i http://localhost:5202/api/telemetry` ได้รับสถานะ `HTTP/1.1 200 OK` พร้อม Response Header `Server: Kestrel` และก้อน JSON Telemetry ทันที
 
 ---
 
