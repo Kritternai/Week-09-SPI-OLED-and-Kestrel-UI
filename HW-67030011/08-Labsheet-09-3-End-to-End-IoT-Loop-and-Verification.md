@@ -486,7 +486,7 @@ python -m esptool --chip esp32  -p COM24 -b 460800 --before default_reset --afte
 
 #### ผลการ Build (67030011)
 
-โค้ดอยู่ที่ [HW-67030011/Lab9-3/Lab9-3-ESP32-ClosedLoop/](HW-67030011/Lab9-3/Lab9-3-ESP32-ClosedLoop/) แก้สตริง Header เป็น `"ESP32 | 67030011"` แล้ว Build ด้วย ESP-IDF v6.0.2 (target `esp32`) ผ่านโดยไม่มี Warning:
+โค้ดอยู่ที่ [Lab9-3/Lab9-3-ESP32-ClosedLoop/](Lab9-3/Lab9-3-ESP32-ClosedLoop/) แก้สตริง Header เป็น `"ESP32 | 67030011"` แล้ว Build ด้วย ESP-IDF v6.0.2 (target `esp32`) ผ่านโดยไม่มี Warning:
 ```text
 $ idf.py set-target esp32
 $ idf.py build
@@ -511,7 +511,7 @@ Project build complete. To flash, run:
 
 **ผลการตรวจสอบ:** ภาพ Framebuffer 1KB ที่ได้จากฟังก์ชัน `render_multizone_ui()` ของเฟิร์มแวร์ (คอมไพล์ส่วนวาดจอชุดเดียวกันแล้ว Dump `s_oled_buffer` ออกมาเป็นภาพ ขยาย 4 เท่า) ในโหมด Edge ที่ raw = 2048:
 
-![Framebuffer EDGE mode](HW-67030011/Images/lab9-3-fb-edge-mode.png)
+![Framebuffer EDGE mode](Images/lab9-3-fb-edge-mode.png)
 
 * Zone 1 แสดง `ESP32 | 67030011`
 * Zone 2 แสดง `RAW:2048   50%` แถบ Gauge ถม 52 จาก 104 พิกเซล (`50 × 104 / 100 = 52`)
@@ -758,7 +758,7 @@ app.Run();
 
 #### สิ่งที่ปรับจากโค้ดในใบงาน (67030011)
 
-โค้ดอยู่ที่ [HW-67030011/Lab9-3/ESP32.Kestrel.Webserver/](HW-67030011/Lab9-3/ESP32.Kestrel.Webserver/) (ต่อยอดจากโปรเจกต์ Lab 9.2)
+โค้ดอยู่ที่ [Lab9-3/ESP32.Kestrel.Webserver/](Lab9-3/ESP32.Kestrel.Webserver/) (ต่อยอดจากโปรเจกต์ Lab 9.2)
 
 1. **`LastRoundTripLatencyMs` เป็น `long` จึงได้ 0 เสมอ:** โค้ดเดิม `Ticks * 100 / 1_000_000` ปัดเศษทิ้งเพราะงานใน Kestrel (Parse → Compute → Write) ใช้เวลาราว 1 ms จึงเปลี่ยนเป็น `double` และใช้ `Stopwatch.GetElapsedTime(receiveTime).TotalMilliseconds` ผลที่ได้จริงคือ `kestrelLatencyMs` ≈ **1.07 – 1.15 ms**
 2. **ตัดข้อความ OLED ที่ 14 ตัวอักษร:** Zone 3 เริ่มวาดข้อความที่ X = 42 ตัวละ 6 px และ `oled_draw_string()` หยุดเมื่อ X > 122 จึงแสดงได้สูงสุด $\lfloor(122-42)/6\rfloor + 1 = 14$ ตัว ถ้าตัดที่ 16 ตามใบงาน 2 ตัวท้ายจะหายจากจอ แต่หน้าเว็บยังแสดงอยู่ ทดสอบส่ง `"IoT ALERT FROM KESTREL"` ได้ `{"status":"success","current":"IoT ALERT FROM"}` ตรงกับที่จอวาดได้
@@ -801,7 +801,7 @@ info: ESP32.Kestrel.Webserver.Services.SerialBridgeService[0]
 
 | Edge Mode | Cloud Mode |
 | :---: | :---: |
-| ![EDGE](HW-67030011/Images/lab9-3-fb-edge-mode.png) | ![CLOUD](HW-67030011/Images/lab9-3-fb-cloud-ready.png) |
+| ![EDGE](Images/lab9-3-fb-edge-mode.png) | ![CLOUD](Images/lab9-3-fb-cloud-ready.png) |
 
 **ข้อสังเกต:** สองโหมดใช้สูตรต่างกัน Edge ใช้ `raw × 100 / 4095` (ไม่ผ่าน Calibration) แต่ Cloud ใช้ Two-Point Calibration (`RawMin = 150`, `RawMax = 3950`) ที่ raw = 1024 Edge ได้ 25% แต่ Cloud ได้ 23% แถบ Gauge จึง "กระโดด" เล็กน้อยทุกครั้งที่สลับโหมด ถ้าจะให้เนียนควรส่งค่า Calibration ลงไปเก็บใน ESP32 (เช่น ผ่านคำสั่ง `CAL:<min>:<max>`) ให้ Edge คำนวณสูตรเดียวกัน
 
@@ -930,11 +930,11 @@ info: ESP32.Kestrel.Webserver.Services.SerialBridgeService[0]
 
 | แดชบอร์ด (raw = 3072) | หลังส่งข้อความ `TEST OK` |
 | :---: | :---: |
-| ![dashboard](HW-67030011/Images/lab9-3-dashboard-telemetry.png) | ![send message](HW-67030011/Images/lab9-3-dashboard-send-message.png) |
+| ![dashboard](Images/lab9-3-dashboard-telemetry.png) | ![send message](Images/lab9-3-dashboard-send-message.png) |
 
 Framebuffer หลังได้รับ `SET:50:TEST OK`:
 
-![Framebuffer TEST OK](HW-67030011/Images/lab9-3-fb-cloud-test-ok.png)
+![Framebuffer TEST OK](Images/lab9-3-fb-cloud-test-ok.png)
 
 ---
 
@@ -1000,7 +1000,7 @@ Measure-Command {
 | ~75% | 3072 | 76.9 | 76.9 | [x] ตรง (80 px, `SET:77`) | `CLOUD: READY` |
 | สูงสุด | 4095 | 100 | 100 | [x] ตรง (104 px, `SET:100`) | `CLOUD: READY` |
 
-![Framebuffer 5 levels](HW-67030011/Images/lab9-3-fb-coverification-5-levels.png)
+![Framebuffer 5 levels](Images/lab9-3-fb-coverification-5-levels.png)
 
 **ข้อสังเกตจากตาราง:**
 * raw = 0 ได้ 0% (ไม่ติดลบ) เพราะ `Compute()` Clamp ค่าไว้ที่ `RawMin = 150` ช่วง 0–150 และ 3950–4095 จึงเป็น "Dead Zone" ที่ Gauge นิ่งอยู่ที่ 0% และ 100%

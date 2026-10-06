@@ -23,6 +23,15 @@
   - Fault Injection Testing (400 Bad Request เมื่อส่ง Slope <= 0 และ 415 Unsupported Media Type)
   - ตอบคำถามท้ายการทดลองครบถ้วนทั้ง 3 ข้อ
 
+### 3. รายงานผลการทดลอง Lab 9.3 (End-to-End Closed-Loop IoT & Co-Verification)
+- [08-Labsheet-09-3-End-to-End-IoT-Loop-and-Verification.md](08-Labsheet-09-3-End-to-End-IoT-Loop-and-Verification.md)
+- **รายละเอียด:** เฟิร์มแวร์ Multi-Zone OLED (Header / Bar Gauge / Footer) + Full-Duplex Serial (`ADC:` ↔ `SET:`) + Hybrid Edge-Cloud Fallback 1.5 วินาที, Kestrel `SerialBridgeService` และ Web Dashboard SVG พร้อม Remote Control ข้อความ
+- **Latency Forensics & Co-Verification:**
+  - HTTP POST `/api/oled/message` 0.31–0.49 ms, Kestrel Serial Processing ≈ 1.1 ms, คำนวณ Serial → OLED ≈ 52–103 ms
+  - ตาราง Co-Verification 5 ระดับ (Kestrel / Web / OLED Framebuffer ตรงกันทุกระดับ)
+  - ปรับโค้ดใบงาน: Latency แบบ `long` ปัดเป็น 0, ข้อความ OLED ยาวสุด 14 ตัว, `Task.Yield()` กันบล็อกการสตาร์ต
+  - ตอบคำถามท้ายการทดลองครบถ้วนทั้ง 3 ข้อ
+
 ---
 
 ## รายการซอร์สโค้ดโปรเจกต์ (Source Code)
@@ -41,6 +50,11 @@
      - [Services/DisplayMessageRequest.cs](ESP32.Kestrel.Webserver/Services/DisplayMessageRequest.cs)
      - [ESP32.Kestrel.Webserver.csproj](ESP32.Kestrel.Webserver/ESP32.Kestrel.Webserver.csproj)
 
+3. **โปรเจกต์ Lab 9.3 (Closed-Loop):**
+   - [Lab9-3/Lab9-3-ESP32-ClosedLoop/](Lab9-3/Lab9-3-ESP32-ClosedLoop/) (ESP-IDF C: [main/Lab9-3-ESP32-ClosedLoop.c](Lab9-3/Lab9-3-ESP32-ClosedLoop/main/Lab9-3-ESP32-ClosedLoop.c))
+   - [Lab9-3/ESP32.Kestrel.Webserver/](Lab9-3/ESP32.Kestrel.Webserver/) (.NET 9: [Program.cs](Lab9-3/ESP32.Kestrel.Webserver/Program.cs), [Services/SerialBridgeService.cs](Lab9-3/ESP32.Kestrel.Webserver/Services/SerialBridgeService.cs), [wwwroot/index.html](Lab9-3/ESP32.Kestrel.Webserver/wwwroot/index.html))
+   - รัน: `dotnet run -- --SerialPort:PortName=COMxx` (macOS ที่ตั้ง Region ไทยให้นำหน้าด้วย `LANG=en_US.UTF-8`)
+
 ---
 
 ## รูปภาพหลักฐานผลการทดลอง (Images Artifacts)
@@ -54,3 +68,6 @@
   - `lab9-2-activity-2-2-routes-build.png` (การผูก Minimal API Routes และผล Build สำเร็จ)
   - `lab9-2-forensic-2-1-curl-endpoints.png` (ผลการยิง cURL ทดสอบทั้ง 3 Endpoints)
   - `lab9-2-forensic-2-2-fault-injection.png` (ผลการทดสอบ Fault Injection 400 Bad Request / 415)
+  - `lab9-3-fb-edge-mode.png`, `lab9-3-fb-cloud-ready.png`, `lab9-3-fb-cloud-test-ok.png` (Framebuffer 1KB จาก `render_multizone_ui()` โหมด Edge / Cloud / หลังรับข้อความ)
+  - `lab9-3-fb-coverification-5-levels.png` (Framebuffer 5 ระดับสำหรับตาราง Co-Verification)
+  - `lab9-3-dashboard-telemetry.png`, `lab9-3-dashboard-send-message.png` (Web Dashboard และการส่งข้อความ)
