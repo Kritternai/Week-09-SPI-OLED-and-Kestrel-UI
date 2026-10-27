@@ -24,7 +24,7 @@
 ### 2.1 บล็อกไดอะแกรมระบบวงปิด (Closed-Loop System Flow)
 
 <p align="center">
-<img src="Images/Closed-Loop%20System%20Flow.svg" width="700">
+<img src="../Images/Closed-Loop%20System%20Flow.svg" width="700">
 </p>
 
 > [!IMPORTANT]
@@ -62,7 +62,7 @@
 เพื่อให้นักศึกษาเข้าใจสถาปัตยกรรมการจัดสรรพื้นที่บนหน้าจอความละเอียดจำกัด ($128 \times 64$ พิกเซล) เราจะแบ่ง Framebuffer 1KB ออกเป็น 3 โซนอิสระ:
 
 <p align="center">
-<img src="Images/OLED_Display_Zone.svg" width="480">
+<img src="../Images/OLED_Display_Zone.svg" width="480">
 </p>
 
 ```
